@@ -26,9 +26,9 @@ export const GameBoard = () => {
     const position = getComponentValueStrict(Position, entity);
     const direction = getComponentValueStrict(HeadDirection, entity);
 
-    const headDirectionEmoji = Direction[direction?.value] === "North" 
-      ? "▲" : Direction[direction?.value] === "East" 
-      ? "▸" : Direction[direction?.value] === "South" ? "▼" : "◂";
+    const headDirectionEmoji = Direction[direction?.value] === "North"
+      ? "▲" : Direction[direction?.value] === "East"
+        ? "▸" : Direction[direction?.value] === "South" ? "▼" : "◂";
 
 
     return {
@@ -56,6 +56,9 @@ export const GameBoard = () => {
     };
   }
   );
+  const snakeLength = snakeLengths?.find(
+    (sl) => sl.entity === playerEntity
+  )?.bodyLength || 0;
 
   const mapConfig = useComponentValue(MapConfig, singletonEntity);
   if (mapConfig == null) {
@@ -88,15 +91,21 @@ export const GameBoard = () => {
 
 
   return (
-    <GameMap
-      width={width}
-      height={height}
-      terrain={terrain}
-      onTileClick={canSpawn ? spawn : undefined}
-      players={players}
-      snakeBodies={snakeBodies}
-      snakeLengths={snakeLengths}
-      food={food}
-    />
+    <div className="bg-black-500 overflow-hidden" >
+      <GameMap
+        width={width}
+        height={height}
+        terrain={terrain}
+        onTileClick={canSpawn ? spawn : undefined}
+        players={players}
+        snakeBodies={snakeBodies}
+        snakeLengths={snakeLengths}
+        food={food}
+      />
+      <div className="p-2 text-white">
+        <p>Snake Game</p>
+        <p>{snakeLength} SNEK</p>
+      </div>
+    </div>
   );
 };

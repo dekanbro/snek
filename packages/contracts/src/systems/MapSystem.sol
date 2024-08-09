@@ -113,15 +113,18 @@ contract MapSystem is System {
     Snake.pushXBody(player, x);
     Snake.pushYBody(player, y);
 
-    for (uint32 i = 0; i < Snake.lengthXBody(player); i++) {
-        bytes32 prevPosition = positionToEntityKey(Snake.getItemXBody(player, i), Snake.getItemYBody(player, i));
-        if (i >= Snake.lengthXBody(player) - SnakeLength.get(player)) {
-           Obstruction.set(prevPosition, true);
-        } else {
-            Obstruction.deleteRecord(prevPosition);
-        }
+    uint32 tailLength = SnakeLength.get(player);
+    uint256 snakeLength = Snake.lengthXBody(player);
 
+
+    if(tailLength > 0 && snakeLength > tailLength) {
+      bytes32 newPosition = positionToEntityKey(Snake.getItemXBody(player, snakeLength-1), Snake.getItemYBody(player, snakeLength-1));
+      Obstruction.set(newPosition, true);
+
+      bytes32 prevPosition = positionToEntityKey(Snake.getItemXBody(player, snakeLength - tailLength), Snake.getItemYBody(player, snakeLength - tailLength));
+      Obstruction.deleteRecord(prevPosition);
     }
+
 
   }
 
