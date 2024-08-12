@@ -9,7 +9,7 @@ export const useTick = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       move(); 
-    }, 800);
+    }, 900);
 
     return () => clearInterval(interval);
   }, [move]);

@@ -2,7 +2,7 @@
 pragma solidity >=0.8.24;
 
 import { System } from "@latticexyz/world/src/System.sol";
-import { MapConfig, Movable, Obstruction, Player, Position, HeadDirection, Snake, SnakeLength, Food } from "../codegen/index.sol";
+import { MapConfig, Movable, Obstruction, Player, Position, HeadDirection, Snake, SnakeLength, Food, Flag, Winner } from "../codegen/index.sol";
 import { Direction } from "../codegen/common.sol";
 
 import { addressToEntityKey } from "../addressToEntityKey.sol";
@@ -67,6 +67,34 @@ contract MapSystem is System {
 
   }
 
+  function eatFlag(bytes32 player, int32 x, int32 y) public {
+    bytes32 position = positionToEntityKey(x, y);
+    require(Flag.get(position), "No flag here");
+
+    Flag.deleteRecord(position);
+
+    Winner.set(player, true);
+    // Player.deleteRecord(player);
+
+  }
+
+  function spawnFlag() public {
+    // require(Flag.get() == 0, "Flag already exists");
+    (uint32 width, uint32 height, ) = MapConfig.get();
+    uint32 x = uint32(block.timestamp) % width;
+    uint32 y = uint32(block.prevrandao) % height;
+
+    bytes32 flagEntity = positionToEntityKey(int32(x), int32(y));
+    while (Obstruction.get(flagEntity)) {
+      x = (x + 1) % width;
+      y = (y + 1) % height;
+      flagEntity = positionToEntityKey(int32(x), int32(y));
+    }
+    Position.set(flagEntity, int32(x), int32(y));
+    Flag.set(flagEntity, true);
+
+  }
+
   function setPlayerDirection(Direction direction) public {
     bytes32 player = addressToEntityKey(_msgSender());
     require(Player.get(player), "not a player");
@@ -107,6 +135,9 @@ contract MapSystem is System {
 
     if(Food.get(position)) {
       eatFood(player, x, y);
+    } 
+    if(Flag.get(position)) {
+      eatFlag(player, x, y);
     } 
     Position.set(player, x, y);
 

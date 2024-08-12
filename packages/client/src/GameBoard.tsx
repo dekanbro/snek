@@ -15,9 +15,9 @@ export const GameBoard = () => {
   useTick();
 
   const {
-    components: { MapConfig, Player, Position, Snake, SnakeLength, Food, HeadDirection },
+    components: { MapConfig, Player, Position, Snake, SnakeLength, Food, HeadDirection, Flag, Winner },
     network: { playerEntity },
-    systemCalls: { spawn },
+    systemCalls: { spawn, spawnFlag },
   } = useMUD();
 
   const canSpawn = useComponentValue(Player, playerEntity)?.value !== true;
@@ -35,7 +35,7 @@ export const GameBoard = () => {
       entity,
       x: position.x,
       y: position.y,
-      emoji: entity === playerEntity ? headDirectionEmoji : "○",
+      emoji: entity === playerEntity ? headDirectionEmoji : "*",
     };
   });
 
@@ -45,7 +45,7 @@ export const GameBoard = () => {
       entity,
       xBody: getComponentValueStrict(Snake, entity).xBody,
       yBody: getComponentValueStrict(Snake, entity).yBody,
-      emoji: "▢",
+      emoji: entity === playerEntity ? "▢" : "○",
     };
   });
 
@@ -59,6 +59,8 @@ export const GameBoard = () => {
   const snakeLength = snakeLengths?.find(
     (sl) => sl.entity === playerEntity
   )?.bodyLength || 0;
+
+  const totalOfSnakeLengths = snakeLengths?.reduce((acc, curr) => acc + curr.bodyLength, 0) || 0;
 
   const mapConfig = useComponentValue(MapConfig, singletonEntity);
   if (mapConfig == null) {
@@ -89,6 +91,26 @@ export const GameBoard = () => {
     };
   });
 
+  const flags = useEntityQuery([Has(Flag), Has(Position)]).map((entity) => {
+    const position = getComponentValueStrict(Position, entity);
+    return {
+      entity,
+      x: position.x,
+      y: position.y,
+      emoji: "⚑",
+    };
+  }
+  );
+
+  const winners = useEntityQuery([Has(Winner), Has(Player)]).map((entity) => {
+
+    return {
+      entity,
+      emoji: entity === playerEntity ? "⚑" : "X",
+      text: entity === playerEntity ? "You Win!" : "You Lose!",
+    }
+  });
+  
 
   return (
     <div className="bg-black-500 overflow-hidden" >
@@ -101,10 +123,22 @@ export const GameBoard = () => {
         snakeBodies={snakeBodies}
         snakeLengths={snakeLengths}
         food={food}
+        flags={flags}
       />
       <div className="p-2 text-white">
-        <p>Snake Game</p>
+        <p>Snek Game</p>
         <p>{snakeLength} SNEK</p>
+        <p>total: {totalOfSnakeLengths} SNEK</p>
+        {!winners.length ? (<button onClick={spawnFlag}>End Game</button>) :
+        (<div className="flex flex-row">
+          {winners.map((winner) => (
+            <div key={winner.entity} className="p-2">
+              {winner.emoji} {winner.text}
+            </div>
+          ))}
+        </div>)}
+
+
       </div>
     </div>
   );

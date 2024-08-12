@@ -17,6 +17,10 @@ interface IMapSystem {
 
   function spawnFood() external;
 
+  function eatFlag(bytes32 player, int32 x, int32 y) external;
+
+  function spawnFlag() external;
+
   function setPlayerDirection(Direction direction) external;
 
   function move() external;

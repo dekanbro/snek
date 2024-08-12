@@ -19,9 +19,11 @@ export default defineWorld({
       },
     },
     Food: "bool",
+    Flag: "bool",
     Movable: "bool",
     Obstruction: "bool",
     Player: "bool",
+    Winner: "bool",
     HeadDirection: {
       schema: {
         id: "bytes32",
@@ -43,7 +45,16 @@ export default defineWorld({
         dataStruct: false,
       },
     },
-    SnakeLength: "uint32",
+    SnakeLength: {
+      schema: {
+        id: "bytes32",
+        value: "uint32",
+      },
+      key: ["id"],
+      codegen: {
+        dataStruct: false,
+      },
+    },
     Position: {
       schema: {
         id: "bytes32",

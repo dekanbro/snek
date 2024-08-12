@@ -7,6 +7,7 @@ type Props = {
   width: number;
   height: number;
   onTileClick?: (x: number, y: number) => void;
+  onButtonClick?: (x: number, y: number) => void;
   terrain?: {
     x: number;
     y: number;
@@ -33,6 +34,11 @@ type Props = {
     y: number;
     emoji: string;
   }[];
+  flags?: {
+    x: number;
+    y: number;
+    emoji: string;
+  }[];
 };
 
 export const GameMap = ({
@@ -43,7 +49,8 @@ export const GameMap = ({
   players,
   snakeBodies,
   snakeLengths,
-  food
+  food,
+  flags
 }: Props) => {
   const {
     network: { playerEntity },
@@ -65,12 +72,12 @@ export const GameMap = ({
             (p) => p.entity === playerEntity
           );
 
-          const snakeLength = snakeLengths?.find(
-            (sl) => sl.entity === playerEntity
-          )?.bodyLength || 0;
-
           const snakeBodiesHere = snakeBodies?.filter(
             (s) => {
+
+              const snakeLength = snakeLengths?.find(
+                (sl) => sl.entity === s.entity
+              )?.bodyLength || 0;
 
               const bodyLength = s.xBody.length;
 
@@ -89,6 +96,8 @@ export const GameMap = ({
               !playersHere?.some((p) => p.entity === playerEntity) &&
               !snakeBodiesHere?.some((s) => s.entity === playerEntity)
           );
+
+          const flagsHere = flags?.filter((f) => f.x === x && f.y === y);
 
           return (
             <div
@@ -122,6 +131,7 @@ export const GameMap = ({
                   ))}
 
                   {foodHere ? <span className="inset-0 flex items-center justify-center text-2xl pointer-events-none">{foodHere.emoji}</span> : null}
+                  {flagsHere ? <span className="inset-0 flex items-center justify-center text-2xl pointer-events-none">{flagsHere.map(f => f.emoji)}</span> : null}
                 </div>
               </div>
             </div>

@@ -102,6 +102,20 @@ export function createSystemCalls(
     }
   };
 
+  const spawnFlag = async () => {
+    if (!playerEntity) {
+      throw new Error("no player");
+    }
+
+    try {
+      const tx = await worldContract.write.spawnFlag();
+      await waitForTransaction(tx);
+    } catch (e) {
+      console.error(e);
+      
+    }
+  }
+
   const spawn = async (inputX: number, inputY: number) => {
     console.log("spawn", inputX, inputY);
     if (!playerEntity) {
@@ -152,5 +166,6 @@ export function createSystemCalls(
     move,
     spawn,
     setPlayerDirection,
+    spawnFlag
   };
 }
